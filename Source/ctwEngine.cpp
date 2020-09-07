@@ -64,9 +64,8 @@ int CtwEngine::encode(string uncompressed, string compressed)
 	{
 		for (int pos = 0; pos < 8; ++pos)
 		{
-			unsigned char  bit, prefix;
-			bit = ByteBit(byte, pos);
-			prefix = BytePrefix(byte, pos);
+			unsigned char  bit = ByteBit(byte, pos); 
+			unsigned char  prefix = BytePrefix(byte, pos);
 
 
 			// setting previous bits of current unsigned char  as history
@@ -125,7 +124,10 @@ int CtwEngine::decode(string compressed, string decompressed)
 			cur_byte  |= (bit << (7 - pos));
 			bit_models[pos].update_tree(bit);
 		}
-
+		for (int pos = 0; pos < 8; pos++)
+		{
+			bit_models[pos].set_context(cur_byte);
+		}
 		// write the decoded byte to file
 		ofs.write((char*)&cur_byte , 1);
 		++size;
