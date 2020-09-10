@@ -6,15 +6,15 @@ project(myCTW VERSION 0.1.0)
 
 set(sources
     main.cpp
-    SRC/arithmeticCoder.cpp
-    SRC/ctwBinaryTree.cpp
-    SRC/ctwEngine.cpp
+    Source/arithmeticCoder.cpp
+    Source/ctwBinaryTree.cpp
+    Source/ctwEngine.cpp
 )
 
 set(headers
-    SRC/arithmeticCoder.h
-    SRC/ctwBinaryTree.h
-    SRC/ctwEngine.h
+    Source/arithmeticCoder.h
+    Source/ctwBinaryTree.h
+    Source/ctwEngine.h
 )
 
 add_executable(myCTW ${sources} ${headers})
