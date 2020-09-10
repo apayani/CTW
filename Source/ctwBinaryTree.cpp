@@ -18,7 +18,7 @@ array <double, LOG_TBL_SIZE> log_table_plus_one;
 
 CtwBinaryTree::CtwBinaryTree(void)
 {
-	 
+	root = make_unique<CTWNodeMB>();
 	for (int n = 0; n < LOG_TBL_SIZE; n++)
 		log_table_plus_half[n] = log(n + .5);
 	 
@@ -32,41 +32,33 @@ CtwBinaryTree::~CtwBinaryTree(void)
 	
 }
 
-
 CTWNodeMB* CtwBinaryTree::FindContext(bool bUpdate)
 {
-	CTWNodeMB *node = &root;
- 
-	int n = 0;
-
+	CTWNodeMB *node = root.get();
 	for (int n = 0; n < depth; n++)
 	{
-		 
-
-
-		CTWNodeMB *child = &node->children[context[n]];
-		
-		if ( child->parent==nullptr)
+		auto it = node->children.find(context[n]);  
+		if ( it == node->children.end())
 		{
-			if (bUpdate)
+			if (bUpdate && node_count<max_tree_size)
 			{
-				child->n0 = child->n1 = 0;
-				child->level = node->level + 1;
-				child->parent = node;
-				child->context = context[n];
-				 
+				
+				auto &ptr =node->children[ context[n] ] = make_unique<CTWNodeMB>(node) ;
+				node = ptr.get();
+
+				++node_count ;
 			}
 			else
 				return node;
-
 		}
+		else
+			node = it->second.get();
 
-		node = child;
-
-		if (  prunning)
-			if ( child->n0 < 2 || child->n1 < 2)
+		
+		if (prunning)
+			if ( node->n0 < 2 || node->n1 < 2)
 			{
-				return child;
+				return node;
 			}
 	}
 
@@ -74,8 +66,9 @@ CTWNodeMB* CtwBinaryTree::FindContext(bool bUpdate)
 }
 
 
-bool CtwBinaryTree::init(int depth, int max_tree_size)
+bool CtwBinaryTree::init(int depth, int max_tree_size, bool prunning)
 {
+	this->prunning =  prunning ;
 	this->max_tree_size = max_tree_size;
 	this->depth = depth;
 
@@ -90,16 +83,10 @@ void CtwBinaryTree::update_tree(unsigned char  new_bit)
 {
 
 	// first update pe of leaf
-
 	// for leaf logPw = 0 ;
 
-	 
-
 	CTWNodeMB *node = FindContext(true);
-
 	double log_gamma = log_table_plus_half[node->n0] - log_table_plus_half[node->n1];
-
-
 
 	while (node->level > 1)
 	{
@@ -274,24 +261,21 @@ double CtwBinaryTree::get_prob_0(CTWNodeMB* node)
 }
 void CtwBinaryTree::update_context(unsigned char  new_bit)
 {
-	int n = 0;
-	for (n = depth - 1; n > 0; n--)
+	for (int n = depth - 1; n > 0; n--)
 	{
 		context[n] = context[n - 1];
 	}
-
 	context[0] = new_bit;
 }
 
-void CtwBinaryTree::set_context(unsigned char new_bit)
+void CtwBinaryTree::set_context(unsigned char new_byte)
 {
-	context[0] = new_bit;
+	context[0] = new_byte;
 }
  
  
 void CtwBinaryTree::clear()
 {
-	 
 }
 
  
