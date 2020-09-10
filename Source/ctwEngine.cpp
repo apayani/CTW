@@ -35,7 +35,7 @@ bool CtwEngine::init(int depth, int max_tree_size)
  
 void CtwEngine::clear()
 {
-	for (auto m : bit_models)
+	for (auto &m : bit_models)
 	{
 		m.clear();
 	}
